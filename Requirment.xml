@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Requirment>
+  <BusinessProcess priority="1" actor="11" verb="12" noun="13">
+    <Step priority="1" actor="12123" verb="343" noun="345" />
+    <Step priority="1" actor="43" verb="454" noun="65" />
+  </BusinessProcess>
+  <BusinessProcess priority="2" actor="21" verb="22" noun="23">
+    <Step priority="2" actor="2323" verb="454656" noun="56">
+      <Action priority="2" actor="2343" verb="454" noun="565" />
+    </Step>
+  </BusinessProcess>
+</Requirment>
+

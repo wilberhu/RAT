@@ -12,7 +12,7 @@ import javax.swing.JTextArea;
 
 public class OutputPanel extends JPanel {
 	Font f;
-	static JTextArea outputarea;
+	public static JTextArea outputarea;
 	JScrollPane output_scrollpane;
 	JLabel lbl_output;
 	public OutputPanel(LayoutManager layout) {

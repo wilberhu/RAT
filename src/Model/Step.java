@@ -2,17 +2,16 @@ package Model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import Controller.BPController;
 
 public class Step extends Description implements IString{
 	
 	private String myString;
-	private Map<Integer,Action> actionMap;
-	
+	private Map<Integer,Action> actionMap;	
 	private int stepPriority;
 
-	public Step() {
-		
-	}
 	
 	public Step(String sTPName, String stepPriority, String actorStr, String verbStr, String nounStr) {
 		super(actorStr, verbStr, nounStr);
@@ -55,7 +54,20 @@ public class Step extends Description implements IString{
 		this.myString = myString;
 	}
 	
+	public void createAction(String actName,String actPriority,String actorStr,String verbStr, String nounStr) {
+		Action action = new Action(actName,actPriority,actorStr,verbStr,nounStr);
+		saveAction(Integer.valueOf(actPriority),action);
+	}
 	
+	private void saveAction(Integer actPriority,Action action) {
+		this.getActionMap().put(actPriority,action);
+	}
+
+	public Action getAction(int keyACT) {
+
+		
+		return actionMap.get(keyACT);
+	}
 	
 
 }

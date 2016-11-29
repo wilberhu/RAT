@@ -1,18 +1,21 @@
 package View;
 
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
-import Model.Action;
 import Controller.BPController;
+import Controller.EditController;
+import Model.Action;
 import Model.BusinessProcess;
 import Model.Step;
 
@@ -21,9 +24,12 @@ public class OutputMouseHandler extends MouseAdapter {
 	OutputPanel handler_parent;
 	JPopupMenu popMenu;
 	JMenuItem edit_item,delete_item;
+	List<String> editList;
+	EditController editController ;
 	
 	public OutputMouseHandler(OutputPanel handler_parent) {
 		this.handler_parent = handler_parent;
+		editController = new EditController();
 	}
 	
 	public void mousePressed(MouseEvent e){
@@ -49,8 +55,7 @@ public class OutputMouseHandler extends MouseAdapter {
 	
 	public int[] extractPriority(String str) {
 		String priority = str.replaceAll("[^\\d.]","");
-		return Arrays.stream(priority.split("\\.")).mapToInt(Integer::parseInt).toArray();
-		
+		return Arrays.stream(priority.split("\\.")).mapToInt(Integer::parseInt).toArray();		
 	}
 	
 	public class EditMenuItemListener implements ActionListener {
@@ -66,31 +71,38 @@ public class OutputMouseHandler extends MouseAdapter {
 				keyBP = extractPriority(OutputPanel.outputarea.getSelectedText());
 				JBPDialog jdlg = new JBPDialog((JFrame) SwingUtilities.getRoot(handler_parent),OutputPanel.outputarea.getSelectedText());
 				jdlg.setVisible(true);
-				mapBP = BPController.getBpMap();
-				bpObj = mapBP.get(keyBP[0]); 
-				jdlg.setComponents(bpObj.getString(), Integer.toString(bpObj.getPriority()), bpObj.getActor().getString(),bpObj.getVerb().getString(),bpObj.getNoun().getString());
+				jdlg.ok.setVisible(false);
+				jdlg.edit.setVisible(true);
+				
+				editList = editController.getBPContent(keyBP[0]);
+				
+				//mapBP = BPController.getBpMap();
+				//bpObj = mapBP.get(keyBP[0]); 
+				jdlg.setComponents(editList.get(0), editList.get(1), editList.get(2),editList.get(3),editList.get(4));
 			}
 			else if (OutputPanel.outputarea.getSelectedText().contains("STP")) {
 				keySTP = extractPriority(OutputPanel.outputarea.getSelectedText());
 				JSTPDialog jdlg = new JSTPDialog((JFrame) SwingUtilities.getRoot(handler_parent),OutputPanel.outputarea.getSelectedText());
 				jdlg.setVisible(true);
-				mapBP = BPController.getBpMap();
-				bpObj = mapBP.get(keySTP[0]); 
-				mapSTP = bpObj.getStepMap();
-				stpObj = mapSTP.get(keySTP[1]);
-				jdlg.setComponents(Integer.toString(keySTP[0])+" "+bpObj.getString(),stpObj.getString(), Integer.toString(keySTP[1]), stpObj.getActor().getString(),stpObj.getVerb().getString(),stpObj.getNoun().getString());
+				
+				jdlg.ok.setVisible(false);
+				jdlg.edit.setVisible(true);
+				
+				editList = editController.getSTPContent(keySTP[0],keySTP[1]);
+				
+				
+				jdlg.setComponents(Integer.toString(keySTP[0])+" "+editList.get(0),editList.get(1), Integer.toString(keySTP[1]), editList.get(2),editList.get(3),editList.get(4));
 			}
 			else if (OutputPanel.outputarea.getSelectedText().contains("ACT")) {
 				keyACT = extractPriority(OutputPanel.outputarea.getSelectedText());
 				JACTDialog jdlg = new JACTDialog((JFrame) SwingUtilities.getRoot(handler_parent),OutputPanel.outputarea.getSelectedText());
 				jdlg.setVisible(true);
-				mapBP = BPController.getBpMap();
-				bpObj = mapBP.get(keyACT[0]); 
-				mapSTP = bpObj.getStepMap();
-				stpObj = mapSTP.get(keyACT[1]);
-				mapACT = stpObj.getActionMap();
-				actObj = mapACT.get(keyACT[2]);
-				jdlg.setComponents(Integer.toString(keyACT[0])+" "+actObj.getString(), Integer.toString(keyACT[1])+" "+actObj.getString(), actObj.getString(),Integer.toString(keyACT[2]),actObj.getActor().getString(),actObj.getVerb().getString(),actObj.getNoun().getString());
+				jdlg.ok.setVisible(false);
+				jdlg.edit.setVisible(true);
+				
+				editList = editController.getACTContent(keyACT[0],keyACT[1],keyACT[2]);
+				
+				jdlg.setComponents(Integer.toString(keyACT[0])+" "+editList.get(0), Integer.toString(keyACT[1])+" "+editList.get(1),editList.get(2), Integer.toString(keyACT[2]),editList.get(3),editList.get(4),editList.get(5));
 				
 			}
 			

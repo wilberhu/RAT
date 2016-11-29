@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -19,31 +20,37 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import Controller.BPController;
+import Controller.EditController;
 import Model.BusinessProcess;
 import Model.Step;
 
 public class JSTPDialog extends JDialog {
 
-	private BPController bPController;
+	private BPController bpController;
 	private BusinessProcess bpObj;
 
 	JLabel name, belong, actor, verb, noun, priority;
 	JTextField _actor, _verb, _noun, _priority;
-	String STPname, STPActor, STPverb, STPnoun, STPpriority,STPbelong;
+	String stpName, stpActor, stpVerb, stpNoun, stpPriority,stpBelong;
 	JTextArea _name;
 	JComboBox _belong;
-	JButton cancel, ok;
+	JButton cancel, ok,edit;
+	List<String> listBP;
 	Font f;
 	JPanel header, footer, center;
 	JTextField _requirement_id;
+	JScrollPane stp_scrollpane;
 
 	JSTPDialog(JFrame parent_frame, String value) {
 		super(parent_frame, "Step - " + value, false);
-		setLayout(new BorderLayout(20, 20));
+		
+		bpController = new BPController();
+		setLayout(new BorderLayout(300,150));
 		setLocationRelativeTo(parent_frame);
 		// setSize(400,600);
 
@@ -56,40 +63,26 @@ public class JSTPDialog extends JDialog {
 		_name.setSize(280, 50);
 		_name.setLineWrap(true);
 		header.add(name);
-		header.add(_name);
+		stp_scrollpane = new JScrollPane(_name,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		header.add(stp_scrollpane);
 
 		belong = new JLabel("belong: ");
 		//ParseBP.parseBP();
 		_belong = new JComboBox();
-
-		// Iterate through the existing business processes
-		Map<Integer, BusinessProcess> mapBP = BPController.getBpMap();
-		BusinessProcess bpObj;
-
-		for (Entry entry : mapBP.entrySet()) {
-
-			bpObj = (BusinessProcess) entry.getValue();
-
-			_belong.addItem(entry.getKey().toString() + " " + bpObj.getString());
-
+		_belong.removeAllItems();
+		listBP = bpController.getAllBP();
+		for(String bp : listBP) {
+			_belong.addItem(bp);
 		}
-
-		// _belong.removeAllItems();
-		/*
-		 * for (String sset : ParseBP.BPIdList) {
-		 * 
-		 * List list =ParseBP.BPmap.get(sset); //String s =
-		 * (String)list.get(1)+" "+list.get(0);
-		 * _belong.addItem((String)list.get(0)); }
-		 */
+		
 		_belong.setSize(150, 50);
 		header.add(belong);
 		header.add(_belong);
 		add(header, BorderLayout.NORTH);
 
-		_name.add(pMenu); // Ã¥Â¯Â®Ã§â€˜Â°Ã¥Å¡Â­Ã¥Â¯Â®?Ã¯Â¿Â½Ã¦Â»Æ’?Ã¦â€ºÅ¾Ã¥Â§Å¾Ã©ï¿½ï¿½Ã£Æ’Â¥Ã¥Å¸Å’Ã©ï¿½â€šÃ¥â€ºÂ¨Ã¦Â¹Â°Ã¥Â¦â€�?Ã¥â€�?â€¢Ã¨â€¦â€˜Ã©â€�â€ºÃ¥Â±Â½?Ã¯Â¹â‚¬Ã¥Å¾Â¯Ã¦Â¶â€œ?Ã©â€˜Â³Ã¨Å Â¥Ã¦Â¨â€°Ã§Â»â‚¬Ã¯Â¿Â½
-		_name.addMouseListener(mouseAdapter); // Ã©ï¿½â€šÃ¥â€ºÂ¨Ã¦Â¹Â°Ã¥Â¦â€�?Ã¥â€�?â€�?Ã¥Â§Å¾Ã©ï¿½ï¿½Ã£Æ’Â©Ã§Â´Â¶Ã©ï¿½ï¿½Ã¥â€ºÂ©Ã¦Â´Æ’Ã¯Â¿Â½Ã®â€žâ‚¬Ã¦Â«â€™
-		pMenu.add(mActor); // Ã¯Â¿Â½Ã¦Â»Æ’?Ã¦â€ºÂ¢Ã£â‚¬ï¿½Ã©ï¿½Â¨Ã¥â€¹Â«?Ã¦â€ºÅ¾Ã¥Å¡Â®Ã¦ÂµÅ“Ã¥Â¬Â©Ã¦Â¬Â¢Ã©ï¿½Â©Ã¦Ë†ï¿½?Ã®â€žâ‚¬Ã¦Â«â€™
+		_name.add(pMenu);
+		_name.addMouseListener(mouseAdapter);
+		pMenu.add(mActor);
 		mActor.addActionListener(menuAction);
 		pMenu.add(mVerb);
 		mVerb.addActionListener(menuAction);
@@ -108,37 +101,32 @@ public class JSTPDialog extends JDialog {
 
 		actor = new JLabel("Actor: ");
 		_actor = new JTextField(10);
-		// Actor.setVisible(false);
-		// _Actor.setVisible(false);
 		center.add(actor);
 		center.add(_actor);
 
 		verb = new JLabel("verb: ");
 		_verb = new JTextField(10);
-		// verb.setVisible(false);
-		// _verb.setVisible(false);
 		center.add(verb);
 		center.add(_verb);
 
 		noun = new JLabel("noun: ");
 		_noun = new JTextField(10);
-		// noun.setVisible(false);
-		// _noun.setVisible(false);
 		center.add(noun);
 		center.add(_noun);
-
-		center.setSize(300, 350);
 		center.setVisible(true);
-
 		add(center, BorderLayout.CENTER);
 
 		footer = new JPanel();
 		cancel = new JButton("Cancel");
 		ok = new JButton("OK");
+		edit = new JButton("EDIT");
 		cancel.addActionListener(new CancelButtonListener());
 		ok.addActionListener(new OkButtonListener());
+		edit.addActionListener(new EditButtonListener());
 		footer.add(cancel);
 		footer.add(ok);
+		footer.add(edit);
+		edit.setVisible(false);
 		add(footer, BorderLayout.SOUTH);
 
 		pack();
@@ -146,17 +134,7 @@ public class JSTPDialog extends JDialog {
 	}
 	
 	public void setComponents (String belong,String name, String priority, String actor, String verb, String noun) {
-		_belong.removeAllItems();
-		Map<Integer, BusinessProcess> mapBP = BPController.getBpMap();
-		BusinessProcess bpObj;
-
-		for (Entry entry : mapBP.entrySet()) {
-
-			bpObj = (BusinessProcess) entry.getValue();
-
-			_belong.addItem(entry.getKey().toString() + " " + bpObj.getString());
-
-		}
+		
 		_belong.setSelectedItem(belong);
 		_name.setText(name);
 		_priority.setText(priority);
@@ -177,24 +155,24 @@ public class JSTPDialog extends JDialog {
 
 	public class OkButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent ae) {
-			STPbelong = _belong.getSelectedItem().toString();
-			STPname = _name.getText();
-			STPpriority = _priority.getText();
-			STPActor = _actor.getText();
-			STPverb = _verb.getText();
-			STPnoun = _noun.getText();
-			String _bpPriority = ""+STPbelong.charAt(0);
+			stpBelong = _belong.getSelectedItem().toString();
+			stpName = _name.getText();
+			stpPriority = _priority.getText();
+			stpActor = _actor.getText();
+			stpVerb = _verb.getText();
+			stpNoun = _noun.getText();
+			String bpPriority = ""+stpBelong.charAt(0);
 			try {
 				
-				bPController = new BPController();
+				bpController = new BPController();
 				
 				//create New BusinessProcess
-				Step stpObj = bPController.createStep(_bpPriority,_name.getText(),_priority.getText(), _actor.getText(), _verb.getText(),_noun.getText());
+				bpController.createStep(bpPriority,stpName,stpPriority, stpActor, stpVerb,stpNoun);
 				
 				//Show Step
-				OutputPanel.outputarea.append("STP " + _bpPriority +"." +  _priority.getText()	+ ": " + _verb.getText() + "( "  + _actor.getText() + ", " + _noun.getText() + " ) " + ".\r\n");
+				OutputPanel.outputarea.append("STP " + bpPriority +"." + stpPriority+ ": " + stpVerb + "( "  + stpActor + ", " + stpNoun + " ) " + ".\r\n");
 
-				// RAT.addSTP(STPbelong, STPname, STPpriority, STPActor,
+				// RAT.addSTP(STPbelong, stpName, STPpriority, STPActor,
 				// STPverb, STPnoun);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -204,30 +182,66 @@ public class JSTPDialog extends JDialog {
 
 		}
 	}
+	
+	public class EditButtonListener implements ActionListener {
+		
+		EditController editController = new EditController();
+		
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
-	PopupMenu pMenu = new PopupMenu(); // Ã©ï¿½â€™Ã¦Â¶ËœÃ§Â¼â€œÃ¥Â¯Â®Ã§â€˜Â°Ã¥Å¡Â­Ã¥Â¯Â®?Ã¯Â¿Â½Ã¦Â»Æ’?Ã¦â€ºÂªÃ§Â´ï¿½Ã¦Â¶â€œÃ¥Â¬Â®?Ã®ï¿½Â­Ã§Â¬ï¿½Ã¦Â¤Â¤Ã¨Â§â€žÃ¦Â§Â¸Ã¯Â¿Â½Ã¦Â»Æ’?Ã¦â€ºÂ¢Ã£â‚¬ï¿½
+				stpBelong = _belong.getSelectedItem().toString();
+				stpName = _name.getText();
+				stpPriority = _priority.getText();
+				stpActor = _actor.getText();
+				stpVerb = _verb.getText();
+				stpNoun = _noun.getText();
+				String bpPriority = ""+stpBelong.charAt(0);
+				String selectedText = OutputPanel.outputarea.getSelectedText();
+				
+				try {
+					
+					
+					//edit New BusinessProcess
+					editController.editStep(bpPriority,stpName,stpPriority,stpActor,stpVerb, stpNoun );
+					
+					OutputPanel.outputarea.setText(OutputPanel.outputarea.getText().replace(selectedText, "STP " + bpPriority +"." + stpPriority+ ": " + stpVerb + "( "  + stpActor + ", " + stpNoun + " ) " + ".\r\n"));
+					
+					//AddtoXML.addBP(bpName, BPpriority, BPactor, BPverb, BPnoun);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				dispose();
+				
+				
+			}
+			
+	
+	}
+
+	PopupMenu pMenu = new PopupMenu();
 
 	MenuItem mActor = new MenuItem("Actor");
 	MenuItem mVerb = new MenuItem("verb");
 	MenuItem mNoun = new MenuItem("noun");
-	MouseAdapter mouseAdapter = new MouseAdapter()// Ã©ï¿½Â©Ã¦Ë†ï¿½?Ã®â€žâ€žÃ§Â´Â¶Ã©ï¿½ï¿½Ã¥â€ºÂ¦Ã§Â°Â¨Ã¦ÂµÂ Ã¯Â¿Â½
+	MouseAdapter mouseAdapter = new MouseAdapter()
 	{
 		public void mouseClicked(MouseEvent event) {
-			if (event.getButton() == MouseEvent.BUTTON3)// Ã¯Â¿Â½Ã®ï¿½â€žÃ¯Â¿Â½Ã¦ï¿½Â´Ã¦â€�?Ë†Ã§Â´Â¶Ã©ï¿½ï¿½Ã¥â€ºÂ§?Ã¦Å Â½Ã¦â€¢Â­Ã¯Â¿Â½Ã¦â€ºÅ¾Ã¥Å¡Â®Ã¦ÂµÅ“Ã¥Â¬Â©Ã¦Â¬Â¢
+			if (event.getButton() == MouseEvent.BUTTON3)
 			{
-				pMenu.show(_name, event.getX(), event.getY());// Ã©ï¿½Â¦Ã£â€žÂ©Ã§Â´Â¶Ã©ï¿½ï¿½Ã¥â€ºÂ¦Ã¯Â¿Â½Ã§Â¼Æ’Ã®â€ Â½Ã¦Â¨â€°Ã§Â»â‚¬Ã¥â€œâ€žÃ¨â€žÅ Ã©ï¿½â€˜Ã¥â€œâ€žÃ¯Â¿Â½Ã¯Â¿Â½Ã¦Â»Æ’?Ã¯Â¿Â½
+				pMenu.show(_name, event.getX(), event.getY());
 			}
 		}
 	};
-	ActionListener menuAction = new ActionListener()// Ã©ï¿½ï¿½?Ã¦ï¿½Â´Ã¦â€“Â¿?Ã¦â€ºÅ¾Ã¥Å¡Â®Ã¯Â¿Â½Ã¦Â»Æ’?Ã¦â€ºÂ¢Ã£â‚¬ï¿½Ã©ï¿½Â¨Ã¥â€¹ÂªÃ§Â°Â¨Ã¦ÂµÂ Ã¯Â¿Â½
-	{// Ã©ï¿½ï¿½Ã¨Å“â€šÃ§Â¶â€¹Ã©ï¿½ï¿½Ã¥â€˜Â­Ã®â€ ï¿½Ã¯Â¿Â½Ã®Ë†ï¿½Ã¥Å¡Å“Ã¥Â®Â¸Ã¨Â¾Â©Ã§Â´ÂªÃ©ï¿½ï¿½Ã¯Â¿Â½
+	ActionListener menuAction = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			MenuItem item = (MenuItem) e.getSource();
-			STPname = _name.getText();
+			stpName = _name.getText();
 			if (item == mActor) {
 				int start = _name.getSelectionStart();
 				int end = _name.getSelectionEnd();
-				String substring = STPname.substring(start, end);
+				String substring = stpName.substring(start, end);
 				try {
 					// addActor(cp);
 					_actor.setText(substring);
@@ -240,7 +254,7 @@ public class JSTPDialog extends JDialog {
 			} else if (item == mVerb) {
 				int start = _name.getSelectionStart();
 				int end = _name.getSelectionEnd();
-				String substring = STPname.substring(start, end);
+				String substring = stpName.substring(start, end);
 				try {
 					// addVerb(cp);
 					_verb.setText(substring);
@@ -255,7 +269,7 @@ public class JSTPDialog extends JDialog {
 			} else if (item == mNoun) {
 				int start = _name.getSelectionStart();
 				int end = _name.getSelectionEnd();
-				String substring = STPname.substring(start, end);
+				String substring = stpName.substring(start, end);
 				try {
 					// addNoun(cp);
 

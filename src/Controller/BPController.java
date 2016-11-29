@@ -1,12 +1,14 @@
 package Controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import Model.Action;
 import Model.BusinessProcess;
 import Model.Step;
-import Model.Action;
 
 public class BPController {
 	
@@ -21,22 +23,22 @@ public class BPController {
 	}
 
 	
-	public BusinessProcess createBusinessProcess(String bPName, String bPpriority, String actorStr,
+	public void createBusinessProcess(String bPName, String bPpriority, String actorStr,
 			String verbStr, String nounStr) {
-
+		
 		businessProcess = new BusinessProcess(bPName,bPpriority,actorStr,verbStr,nounStr);
 		saveBusinessProcess(Integer.valueOf(bPpriority),businessProcess);
-		return businessProcess;
+		
 	}
-	public Step createStep(String bpPriority, String stpName,String stpPriority,String actorStr,String verbStr, String nounStr) {
-		step = new Step(stpName,stpPriority,actorStr,verbStr,nounStr);
-		saveStep(Integer.valueOf(bpPriority),Integer.valueOf(stpPriority),step);
-		return step;
+	public void createStep(String bpPriority, String stpName,String stpPriority,String actorStr,String verbStr, String nounStr) {
+		
+		BusinessProcess bpObj = getBP(Integer.parseInt(bpPriority));
+		bpObj.createStep(stpName,stpPriority,actorStr,verbStr,nounStr);
 	}
-	public Action createAction(String bpPriority,String stpPriority,String actName,String actPriority,String actorStr,String verbStr, String nounStr) {
-		action = new Action(actName,actPriority,actorStr,verbStr,nounStr);
-		saveAction(Integer.valueOf(bpPriority),Integer.valueOf(stpPriority),Integer.valueOf(actPriority),action);
-		return action;
+	public void createAction(String bpPriority,String stpPriority,String actName,String actPriority,String actorStr,String verbStr, String nounStr) {
+		BusinessProcess bpObj = getBP(Integer.parseInt(bpPriority));
+		Step stepObj = bpObj.getStep(Integer.parseInt(stpPriority));
+		stepObj.createAction(actName,actPriority,actorStr,verbStr,nounStr);
 	}
 
 	private void saveBusinessProcess(Integer bPpriority,BusinessProcess businessProcess) {
@@ -45,28 +47,29 @@ public class BPController {
 		
 	}
 	
-	private void saveStep(Integer bpPriority, Integer stpPriority,Step step) {
-		Map<Integer, BusinessProcess> mapBP = BPController.getBpMap();
-		BusinessProcess bpObj = mapBP.get(bpPriority);
-		bpObj.getStepMap().put(Integer.valueOf(stpPriority),step);		
-		
+	BusinessProcess getBP(int bpPriority) {
+		return bpMap.get(bpPriority);
 	}
 	
-	private void saveAction(Integer bpPriority,Integer stpPriority,Integer actPriority,Action action) {
-
-		Map<Integer, BusinessProcess> mapBP = BPController.getBpMap();
-		BusinessProcess bpObj = mapBP.get(bpPriority);
+	public List<String> getAllBP() {
 		
-		for(Entry entry: bpObj.getStepMap().entrySet()){
-			
-			if(Integer.parseInt((entry.getKey().toString())) == stpPriority)
-			{
-				Step stepObj = (Step)entry.getValue();
-				//add action to this step
-				stepObj.getActionMap().put(Integer.valueOf(actPriority),action);
-				break;
-				
-			}	
+		List<String> listBP = new ArrayList<String>();
+		
+		for (Entry entry : bpMap.entrySet()) {
+
+			BusinessProcess bpObj = (BusinessProcess) entry.getValue();
+
+			listBP.add(entry.getKey().toString() + " " + bpObj.getString());
 		}
+		
+		return listBP;
 	}
+	
+	public List<String> getAllStep(int keyBP) {
+		
+		BusinessProcess bpObj = bpMap.get(keyBP);
+		List<String> listSTP = bpObj.getSteps();
+		return listSTP;
+	}
+	
 }

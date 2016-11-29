@@ -5,14 +5,6 @@ public class Description {
 	private Actor actor;
 	private Verb verb;
 	private Noun noun;
-	
-	
-	
-	public Description() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
 
 	public Description(String actorStr, String verbStr, String nounStr) {
 			

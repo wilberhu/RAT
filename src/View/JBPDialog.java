@@ -20,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -27,6 +28,7 @@ import javax.swing.JTextField;
 
 
 import Controller.BPController;
+import Controller.EditController;
 import Model.BusinessProcess;
 
 
@@ -34,18 +36,22 @@ import Model.BusinessProcess;
 public class JBPDialog extends JDialog {
 	
 	private BPController bPController;
+	private EditController editController;
 	
 	JLabel name, actor, verb, noun, priority;
 	JTextField _actor, _verb, _noun, _priority;
-	String BPname, BPactor, BPverb, BPnoun, BPpriority;
+	String bpName, bpActor, bpVerb, bpNoun, bpPriority;
 	JTextArea _name;
-	JButton cancel,ok;
+	JButton cancel,ok,edit;
 	Font f;
 	JPanel header,footer,center;
 	JTextField _requirement_id;
+	JScrollPane bp_scrollpane;
+	
+	
 	JBPDialog(JFrame parent_frame,String value) {
 		super (parent_frame,"BusinessProcess - "+value,false);
-		setLayout(new BorderLayout(20,20));
+		setLayout(new BorderLayout(300,150));
 		//setSize(400,600);
 		
 		f=new Font("Arial",Font.PLAIN,25);
@@ -58,12 +64,14 @@ public class JBPDialog extends JDialog {
 		_name.setLineWrap(true);
 		header.add(name);
 		header.add(_name);
+		bp_scrollpane = new JScrollPane(_name,JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		header.add(bp_scrollpane);
 		add(header,BorderLayout.NORTH);
 		
 		
-		_name.add(pMenu); // å¼¹å‡ºå¼?è?œå?•åŠ å…¥åˆ°æ–‡æœ¬æ¡†ä¸­ï¼Œå?¦åˆ™ä¸?èƒ½æ˜¾ç¤º
-		_name.addMouseListener(mouseAdapter); // æ–‡æœ¬æ¡†åŠ å…¥é¼ æ ‡ç›‘å?¬å™¨
-		pMenu.add(mActor); // è?œå?•é¡¹çš„å?•å‡»äº‹ä»¶ç›‘å?¬å™¨
+		_name.add(pMenu);
+		_name.addMouseListener(mouseAdapter);
+		pMenu.add(mActor);
 		mActor.addActionListener(menuAction);
 		pMenu.add(mVerb);
 		mVerb.addActionListener(menuAction);
@@ -86,26 +94,18 @@ public class JBPDialog extends JDialog {
 		
 		actor = new JLabel("actor: ");
 		_actor = new JTextField (10);
-		//actor.setVisible(false);
-		//_actor.setVisible(false);
 		center.add(actor);
 		center.add(_actor);
 		
 		verb = new JLabel("verb: ");
 		_verb = new JTextField (10);
-		//verb.setVisible(false);
-		//_verb.setVisible(false);
 		center.add(verb);
 		center.add(_verb);
 		
 		noun = new JLabel("noun: ");
 		_noun = new JTextField (10);
-		//noun.setVisible(false);
-		//_noun.setVisible(false);
 		center.add(noun);
 		center.add(_noun);
-
-        center.setSize(300,350);
         center.setVisible(true);
 		
 		add(center,BorderLayout.CENTER);
@@ -113,10 +113,14 @@ public class JBPDialog extends JDialog {
 		footer = new JPanel();
 		cancel = new JButton("Cancel");
 		ok = new JButton("OK");
+		edit = new JButton("EDIT");
 		cancel.addActionListener(new CancelButtonListener());
 		ok.addActionListener(new OkButtonListener());		
+		edit.addActionListener(new EditButtonListener());
 		footer.add(cancel);
 		footer.add(ok);
+		footer.add(edit);
+		edit.setVisible(false);
 		add(footer,BorderLayout.SOUTH);
 		
 		pack();
@@ -132,35 +136,31 @@ public class JBPDialog extends JDialog {
 	public Insets getInsets() {
 		return new Insets(50,50,50,50);
 	}
+	
 	public class CancelButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent ae) {
 			dispose();
 		}
 	}
+	
 	public class OkButtonListener implements ActionListener {
 		String actor,verb,noun,priority;
 		public void actionPerformed(ActionEvent ae) {
-			BPname = _name.getText();
-			BPpriority = _priority.getText();
-			BPactor = _actor.getText();
-			BPverb = _verb.getText();
-			BPnoun = _noun.getText();
+			bpName = _name.getText();
+			bpPriority = _priority.getText();
+			bpActor = _actor.getText();
+			bpVerb = _verb.getText();
+			bpNoun = _noun.getText();
 			try {
 				
 				bPController = new BPController();
 				
 				//create New BusinessProcess
-				BusinessProcess bpObj = bPController.createBusinessProcess(_name.getText(),_priority.getText(),_actor.getText(),
-						_verb.getText(), _noun.getText() );
+				bPController.createBusinessProcess(bpName,bpPriority,bpActor,bpVerb, bpNoun );
 				
-				//show on output panel
-				priority = Integer.toString(bpObj.getPriority());
-				actor = bpObj.getActor().getString();
-				verb = bpObj.getVerb().getString();
-				noun= bpObj.getNoun().getString();
-				OutputPanel.outputarea.append("BP " + priority	+ ": " + verb + "( "  + actor + ", " + noun + " ) " + ".\r\n");
+				OutputPanel.outputarea.append("BP " + bpPriority	+ ": " + bpVerb + "( "  + bpActor + ", " + bpNoun + " ) " + ".\r\n");
 				
-				//AddtoXML.addBP(BPname, BPpriority, BPactor, BPverb, BPnoun);
+				//AddtoXML.addBP(bpName, BPpriority, BPactor, BPverb, BPnoun);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -170,30 +170,67 @@ public class JBPDialog extends JDialog {
 		}
 	}
 	
+	public class EditButtonListener implements ActionListener {
+		
+		EditController editController = new EditController();
+		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				bpName = _name.getText();
+				bpPriority = _priority.getText();
+				bpActor = _actor.getText();
+				bpVerb = _verb.getText();
+				bpNoun = _noun.getText();
+				String selectedText = OutputPanel.outputarea.getSelectedText();
+				
+				try {
+					
+					
+					//edit New BusinessProcess
+					editController.editBusinessProcess(bpName,bpPriority,bpActor,bpVerb, bpNoun );
+					
+					OutputPanel.outputarea.setText(OutputPanel.outputarea.getText().replace(selectedText, "BP " + bpPriority	+ ": " + bpVerb + "( "  + bpActor + ", " + bpNoun + " ) " + ".\r\n"));
+					
+					//AddtoXML.addBP(bpName, BPpriority, BPactor, BPverb, BPnoun);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				dispose();
+				
+				
+			}
+			
 	
-	PopupMenu pMenu = new PopupMenu(); // åˆ›å»ºå¼¹å‡ºå¼?è?œå?•ï¼Œä¸‹é?¢ä¸‰é¡¹æ˜¯è?œå?•é¡¹
+	}
+	
+	
+	PopupMenu pMenu = new PopupMenu(); // åˆ›å»ºå¼¹å‡ºï¿½?ï¿½?ï¿½ï¿½?ï¿½ï¼Œä¸‹ï¿½?ï¿½ä¸‰é¡¹æ˜¯ï¿½?ï¿½ï¿½?ï¿½é¡¹
 	
 	MenuItem mActor = new MenuItem("actor");
 	MenuItem mVerb = new MenuItem("verb");
 	MenuItem mNoun = new MenuItem("noun");
-	MouseAdapter mouseAdapter = new MouseAdapter()// ç›‘å?¬é¼ æ ‡äº‹ä»¶
+	MouseAdapter mouseAdapter = new MouseAdapter()// ç›‘ï¿½?ï¿½é¼ æ ‡äº‹ä»¶
 	{
 		public void mouseClicked(MouseEvent event) {
-			if (event.getButton() == MouseEvent.BUTTON3)// å?ªå“?åº”é¼ æ ‡å?³é”®å?•å‡»äº‹ä»¶
+			if (event.getButton() == MouseEvent.BUTTON3)// ï¿½?ï¿½ï¿½?åº”é¼ æ ‡ï¿½?ï¿½é”®ï¿½?ï¿½å‡»äº‹ä»¶
 			{
-				pMenu.show(_name, event.getX(), event.getY());// åœ¨é¼ æ ‡ä½?ç½®æ˜¾ç¤ºå¼¹å‡ºå¼?è?œå?•
+				pMenu.show(_name, event.getX(), event.getY());// åœ¨é¼ æ ‡ï¿½?ç½®æ˜¾ç¤ºå¼¹å‡ºï¿½?ï¿½?ï¿½ï¿½?ï¿½
 			}
 		}
 	};
-	ActionListener menuAction = new ActionListener()// å“?åº”å?•å‡»è?œå?•é¡¹çš„äº‹ä»¶
-	{// å…·ä½“å†…å®¹å?¯è‡ªå·±ç¼–å†™
+	
+	ActionListener menuAction = new ActionListener() {
+		@Override
 		public void actionPerformed(ActionEvent e) {
 			MenuItem item = (MenuItem) e.getSource();
-			BPname = _name.getText();
+			bpName = _name.getText();
+			
 			if (item == mActor){
 				int start = _name.getSelectionStart();
 				int end = _name.getSelectionEnd();
-				String substring = BPname.substring(start, end);
+				String substring = bpName.substring(start, end);
 				try {
 					//addActor(cp);
 					_actor.setText(substring);
@@ -203,10 +240,11 @@ public class JBPDialog extends JDialog {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
 			} else if (item == mVerb){
 				int start = _name.getSelectionStart();
 				int end = _name.getSelectionEnd();
-				String substring = BPname.substring(start, end);
+				String substring = bpName.substring(start, end);
 				try {
 					//addVerb(cp);
 					_verb.setText(substring);
@@ -221,7 +259,7 @@ public class JBPDialog extends JDialog {
 			} else if (item == mNoun) {
 				int start = _name.getSelectionStart();
 				int end = _name.getSelectionEnd();
-				String substring = BPname.substring(start, end);
+				String substring = bpName.substring(start, end);
 				try {
 					//addNoun(cp);
 					

@@ -27,7 +27,7 @@ public class NLPParser implements ParserInterface{
 		
 		try {
 			
-			tagger = new MaxentTagger("lib/left3words-wsj-0-18.tagger");
+			tagger = new MaxentTagger("left3words-wsj-0-18.tagger");
 			
 		} catch (ClassNotFoundException e1) {
 			// TODO Auto-generated catch block

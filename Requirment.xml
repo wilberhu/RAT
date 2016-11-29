@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Requirment>
-  <BusinessProcess priority="1" actor="user" verb="give" noun="description" />
-</Requirment>
-

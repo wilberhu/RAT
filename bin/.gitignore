@@ -1,5 +1,4 @@
-/View/
-/Controller/
 /bridge/
-/Command/
-/.DS_Store
+/Model/
+/left3words-wsj-0-18.tagger.props
+/left3words-wsj-0-18.tagger

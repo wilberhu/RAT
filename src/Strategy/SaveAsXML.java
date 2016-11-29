@@ -1,4 +1,4 @@
-package Command;
+package Strategy;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,15 +16,15 @@ import Model.Action;
 import Model.BusinessProcess;
 import Model.Step;
 
-public class SaveAsXML extends CommandInterface{
-	
+public class SaveAsXML extends Strategy{
 	String name, priority, actor, verb, noun,stepPriority,actionPriority;
 	BusinessProcess bpObj;
 	Step stepObj;
 	Action actionObj;
 	Map<Integer,BusinessProcess> bpMap;
-	
-	public void execute(){
+	@Override
+	public void save() {
+		// TODO Auto-generated method stub
 		try {
 
 			String actor,verb,noun,priority;
@@ -93,5 +93,7 @@ public class SaveAsXML extends CommandInterface{
 		  } catch (IOException io) {
 			System.out.println(io.getMessage());
 		  }
+		
 	}
+
 }

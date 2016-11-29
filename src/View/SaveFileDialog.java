@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import Controller.BPController;
+import Controller.ExportController;
 import Model.Action;
 import Model.BusinessProcess;
 import Model.Step;
@@ -30,10 +31,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
-import Command.CommandInterface;
-import Command.SaveAsBinary;
-import Command.SaveAsXML;
+import Strategy.*;
 
 public class SaveFileDialog  extends JDialog {
 	
@@ -85,8 +83,9 @@ public class SaveFileDialog  extends JDialog {
 		
 		public void actionPerformed(ActionEvent ae) {
 			
-			CommandInterface save_Binary = new SaveAsBinary();
-			save_Binary.execute();
+//			CommandInterface save_Binary = new SaveAsBinary();
+//			save_Binary.execute();
+			new ExportController().use(new SaveAsBinary());
 			dispose();
 			
 		}
@@ -96,9 +95,10 @@ public class SaveFileDialog  extends JDialog {
 		
 		public void actionPerformed(ActionEvent ae) {
 			
-			CommandInterface save_XML = new SaveAsXML();
-			save_XML.execute();
+//			CommandInterface save_XML = new SaveAsXML();
+//			save_XML.execute();
 			
+			new ExportController().use(new SaveAsXML());
 			dispose();
 			
 		}
